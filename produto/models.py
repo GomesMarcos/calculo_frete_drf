@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from transportadora.models import Transportadora
 
 
-class Object(models.Model):
+class Produto(models.Model):
     nome = models.CharField(max_length=150)
     preco = models.DecimalField(decimal_places=2, max_digits=999)
     peso = models.PositiveSmallIntegerField()

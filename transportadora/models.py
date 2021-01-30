@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class Object(models.Model):
+class Transportadora(models.Model):
     nome = models.CharField(max_length=50)
     constante_para_calculo_de_frete = models.DecimalField(
         decimal_places=1, max_digits=2)
