@@ -18,4 +18,7 @@ Seguem passos abaixo:
 - `pip install -r requirements.txt`
 - `./runserver`
 
-A API Root está disponível, por padrão, [aqui](http://127.0.0.1:8000/api/)
+### Testando a API
+
+A API Root está disponível, por padrão, [aqui](http://127.0.0.1:8000/api/v1/)
+O link para consulta de frete está disponível [aqui](http://127.0.0.1:8000/api/v1/produtos/1/frete), onde o número corresponde ao id do produto requisitando o frete
