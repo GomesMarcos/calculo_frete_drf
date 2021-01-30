@@ -14,6 +14,7 @@ Seguem passos abaixo:
 
 - `virtualenv venv`
 - `source ./script_activate.sh`
+- `python manage.py createsuperuser --email <user_email> --username <user_name>` subistitua os nomes entre <> pelos respectivos valores
 - `pip install -r requirements.txt`
 - `./runserver`
 
