@@ -48,8 +48,9 @@ def montar_dados_frete(request, pk=None):
 
     # Validando produto
     validacao_produto = validar_produto(produto)
-    mensagem = validacao_produto['msg']
     status_validacao_produto = validacao_produto['status']
+    if 'msg' in validacao_produto:
+        mensagem = validacao_produto['msg']
 
     if not produto == {} and validacao_produto['status'] == True:
         for transportadora in transportadoras:
