@@ -7,7 +7,7 @@ class Produto(models.Model):
     nome = models.CharField(max_length=150)
     preco = models.DecimalField(decimal_places=2, max_digits=999)
     peso = models.PositiveSmallIntegerField()
-    dimensoes = models.JSONField(default=dict)
+    dimensao = models.JSONField(default=dict)
 
     class Meta:
         verbose_name = _('produto')
