@@ -1,10 +1,11 @@
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+from transportadora.models import Transportadora
 from .serializers import ProdutoSerializer
 from .models import Produto
-from transportadora.models import Transportadora
+from .validations import *
 
 
 class ProdutoViewSet(viewsets.ModelViewSet):
@@ -15,58 +16,50 @@ class ProdutoViewSet(viewsets.ModelViewSet):
     serializer_class = ProdutoSerializer
 
 
-@api_view(['GET'])
-def montar_dados_frete(request, pk):
+@api_view(['GET', 'POST'])
+def montar_dados_frete(request, pk=None):
     """
     Função responsável por montar a lista de fretes compatível
     com as dimensões do produto
 
     Args:
         request (rest_framework.request.Request): Requisição feita à API
-        pk (int): identificador do para o objeto "Produto"
+        pk (int): identificador do para o objeto "Produto",
+            caso esteja consultando um produto cadastrado no painel administrativo
 
     Returns:
-        frete_list(list): Lista com os objetos serializados informando os dados para o frete
+        frete_list (list): Lista com os objetos serializados informando os dados para o frete
     """
 
     transportadoras = Transportadora.objects.all()
     frete_list = list()
+    status_validacao_produto = True
 
-    print('\n\n\n', type(request), type(pk), '\n\n\n')
+    # Validando se o produto é oriundo do banco de dados ou do teste da API
+    if pk == None:
+        produto = request.data
+    else:
+        produto = Produto.objects.filter(id=pk).values()[0]
 
-    produto = Produto.objects.filter(id=pk).values()
+    # Caso esteja acessando http://127.0.0.1:8000/api/v1/frete pelo navegador
+    if produto == {} and request.method == 'GET':
+        mensagem = 'Olá! Espero que você se divita testando essa API feita com muito carinho e café. =)'
+        return Response({'msg': mensagem}, status=status.HTTP_200_OK)
 
-    for transportadora in transportadoras:
-        if validar_parametros_frete(produto, transportadora):
-            frete_list.append(dict({
-                'nome': transportadora.nome,
-                'valor_frete': (produto[0]['peso'] * transportadora.constante_para_calculo_de_frete) / 10,
-                'prazo_dias': transportadora.prazo_entrega
-            }))
+    # Validando produto
+    validacao_produto = validar_produto(produto)
+    mensagem = validacao_produto['msg']
+    status_validacao_produto = validacao_produto['status']
 
-    return Response(frete_list)
+    if not produto == {} and validacao_produto['status'] == True:
+        for transportadora in transportadoras:
+            if validar_parametros_frete(produto, transportadora) == True:
+                frete_list.append(dict({
+                    'nome': transportadora.nome,
+                    'valor_frete': (produto['peso'] * transportadora.constante_para_calculo_de_frete) / 10,
+                    'prazo_dias': transportadora.prazo_entrega
+                }))
+        return Response(frete_list)
 
-
-def validar_parametros_frete(produto, transportadora):
-    """
-    Valida se o produto é apto ou não a ser inserido
-    na lista de fretes de acordo com as dimensões mínimas e máximas
-    dadas pela transportadora
-
-    Args:
-        produto (QuerySet): [description]
-        transportadora (QuerySet): [description]
-
-    Returns:
-        bool: Caso as dimensões do produto estejam dentro dos parâmetros da transportadora, True
-    """
-    if produto[0]['dimensoes']['altura'] < transportadora.altura_minima:
-        return False
-    if produto[0]['dimensoes']['altura'] > transportadora.altura_maxima:
-        return False
-    if produto[0]['dimensoes']['largura'] < transportadora.largura_minima:
-        return False
-    if produto[0]['dimensoes']['largura'] > transportadora.largura_maxima:
-        return False
-
-    return True
+    else:
+        return Response({'msg': mensagem}, status=status.HTTP_400_BAD_REQUEST)
