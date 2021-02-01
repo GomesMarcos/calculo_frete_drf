@@ -16,7 +16,7 @@ Seguem passos abaixo:
 - `source ./script_activate.sh`
 - `pip install -r requirements.txt`
 - `python manage.py createsuperuser --email <user_email> --username <user_name>` subistitua os nomes entre <> pelos respectivos valores
-- `./runserver`
+- `./script_runserver.sh`
 
 ### Testando a API
 
