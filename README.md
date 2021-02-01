@@ -1,6 +1,6 @@
 # Cálculo de Frete Baseado em Medidas
 
-## Executando o proheto
+## Executando o projeto
 
 Para montagem e execução do do projeto, foram criados alguns scrips personalizados.
 Seguem passos abaixo:
